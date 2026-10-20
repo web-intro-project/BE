@@ -39,6 +39,23 @@ export DB_PASSWORD=change-me
 
 환경변수 목록은 `.env.example` 참고. 테이블(`song_requests`)은 시작 시 자동 생성된다 (`DDL_AUTO`, 기본 `update`).
 
+## API
+
+모든 날짜 판단은 Asia/Seoul 기준이다.
+
+| 메서드 | 경로 | 설명 |
+|---|---|---|
+| GET | `/api/today` | 오늘의 대표 신청곡(오늘 가장 먼저 접수된 신청)과 오늘 신청 건수. 없으면 `song: null` |
+| POST | `/api/requests` | 신청 저장 → 201. 본문 `{date, songTitle, artist, applicantName}` |
+| GET | `/api/requests?date=YYYY-MM-DD` | 날짜별 신청 목록 (접수 순) |
+| GET | `/api/calendar?month=YYYY-MM` | 그 달 모든 날짜의 신청 건수와 곡 목록 |
+
+오류 응답은 `{code, message, field?, fieldErrors?}` 형식이다 (`VALIDATION_ERROR` 400, `NOT_FOUND` 404, `METHOD_NOT_ALLOWED` 405, `INTERNAL_SERVER_ERROR` 500).
+
+### CORS
+
+`CORS_ALLOWED_ORIGINS`(쉼표 구분)에 FE 주소를 넣는다. 기본값은 FE 개발 서버 `http://localhost:8000`, `http://127.0.0.1:8000`.
+
 ## 테스트
 
 ```bash
