@@ -1,4 +1,4 @@
-package com.webintro.wakesong.calendar;
+package com.webintro.wakesong.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

@@ -1,4 +1,4 @@
-package com.webintro.wakesong.today;
+package com.webintro.wakesong.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 import com.webintro.wakesong.ApiTestSupport;
-import com.webintro.wakesong.common.TimeConfig;
+import com.webintro.wakesong.config.ClockConfig;
+import com.webintro.wakesong.dto.TodayResponse;
+import com.webintro.wakesong.service.SongService;
 
 class TodayTest extends ApiTestSupport {
 
@@ -46,11 +48,11 @@ class TodayTest extends ApiTestSupport {
 	@Test
 	void 오늘은_서울_기준이다() {
 		// UTC로는 10/19 16:00이지만 서울로는 10/20 01:00
-		Clock seoulAfterMidnight = Clock.fixed(Instant.parse("2026-10-19T16:00:00Z"), TimeConfig.SEOUL);
+		Clock seoulAfterMidnight = Clock.fixed(Instant.parse("2026-10-19T16:00:00Z"), ClockConfig.SEOUL);
 		save("2026-10-19", "UTC기준오늘", "가수", "A", Instant.parse("2026-10-18T01:00:00Z"));
 		save("2026-10-20", "서울기준오늘", "가수", "B", Instant.parse("2026-10-18T01:00:00Z"));
 
-		TodayResponse res = new TodayController(repository, seoulAfterMidnight).today();
+		TodayResponse res = new SongService(repository, seoulAfterMidnight).today();
 
 		assertThat(res.date()).isEqualTo(LocalDate.of(2026, 10, 20));
 		assertThat(res.song().title()).isEqualTo("서울기준오늘");

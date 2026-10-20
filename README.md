@@ -4,11 +4,33 @@
 
 ## 기술 스택
 
-- Java 17, Spring Boot 4.1 (Web MVC, Validation, Data JPA)
+- Java 17, Spring Boot 4.1 (Web MVC, Data JPA), Lombok
 - DB: MySQL (기본) / H2 (`local` 프로필, 테스트)
 - 빌드: Gradle Wrapper, 테스트: JUnit 5 + MockMvc
 
 > 명세서의 추천안은 Spring Boot 3.x였지만, 3.x는 오픈소스 지원이 끝나 Spring Initializr 기본값인 4.1을 사용한다.
+
+## 코드 구조
+
+요청은 항상 **Controller → Service → Repository → DB** 순서로 흐른다.
+
+```text
+src/main/java/com/webintro/wakesong/
+├── controller/SongController       API 4개. 받아서 Service에 넘기기만 한다
+├── service/SongService             업무 규칙 전부 (대표곡, 저장+입력 검사, 날짜별, 달력)
+├── repository/SongRequestRepository  DB 조회 2개: findAllByDate, findAllBetween
+├── domain/SongRequest              song_requests 테이블 한 줄
+├── dto/                            요청/응답 JSON 모양 (SongCreateRequest, SongResponse, ...)
+├── exception/                      오류 → {code, message, field} 응답 변환
+└── config/                         서울 시계(ClockConfig), CORS
+```
+
+| API | Controller | Service |
+|---|---|---|
+| `GET /api/today` | `today()` | 오늘 신청 중 첫 번째 |
+| `POST /api/requests` | `create()` | `checkDate` → `checkText` ×3 → 저장 |
+| `GET /api/requests?date=` | `byDate()` | 그 날짜 신청 목록 |
+| `GET /api/calendar?month=` | `calendar()` | 1일~말일 돌며 날짜별로 묶기 |
 
 ## 실행
 
@@ -50,7 +72,7 @@ export DB_PASSWORD=change-me
 | GET | `/api/requests?date=YYYY-MM-DD` | 날짜별 신청 목록 (접수 순) |
 | GET | `/api/calendar?month=YYYY-MM` | 그 달 모든 날짜의 신청 건수와 곡 목록 |
 
-오류 응답은 `{code, message, field?, fieldErrors?}` 형식이다 (`VALIDATION_ERROR` 400, `NOT_FOUND` 404, `METHOD_NOT_ALLOWED` 405, `INTERNAL_SERVER_ERROR` 500).
+오류 응답은 `{code, message, field?}` 형식이다. 입력 오류는 위에서부터 검사해 첫 번째 오류만 돌려준다 (`VALIDATION_ERROR` 400, `NOT_FOUND` 404, `METHOD_NOT_ALLOWED` 405, `INTERNAL_SERVER_ERROR` 500).
 
 ### CORS
 
