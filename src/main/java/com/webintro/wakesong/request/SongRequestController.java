@@ -2,8 +2,6 @@ package com.webintro.wakesong.request;
 
 import java.time.LocalDate;
 
-import jakarta.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +28,7 @@ public class SongRequestController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public SongRequestResponse create(@Valid @RequestBody CreateSongRequest body) {
+	public SongRequestResponse create(@RequestBody CreateSongRequest body) {
 		return service.create(body);
 	}
 

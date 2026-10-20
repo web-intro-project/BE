@@ -1,14 +1,5 @@
 package com.webintro.wakesong.request;
 
-import java.time.LocalDate;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
-public record CreateSongRequest(
-		@NotNull LocalDate date,
-		@NotBlank @Size(max = 100) String songTitle,
-		@NotBlank @Size(max = 100) String artist,
-		@NotBlank @Size(max = 20) String applicantName) {
+/** 신청 요청 본문. 형식·길이·날짜 검증은 SongRequestValidator에서 한다. */
+public record CreateSongRequest(String date, String songTitle, String artist, String applicantName) {
 }
