@@ -1,6 +1,9 @@
 # BE
 
-기상송 — 기숙사 아침 기상송 신청 게시판 백엔드. 요구사항과 API 계약은 [`BACKEND_SPEC.md`](BACKEND_SPEC.md) 참고.
+기상송 — 기숙사 아침 기상송 신청 게시판 백엔드.
+
+- API 명세: [`API_SPEC.md`](API_SPEC.md)
+- 요구사항: [`BACKEND_SPEC.md`](BACKEND_SPEC.md)
 
 ## 기술 스택
 
