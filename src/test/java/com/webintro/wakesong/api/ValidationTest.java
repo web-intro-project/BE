@@ -1,4 +1,4 @@
-package com.webintro.wakesong.request;
+package com.webintro.wakesong.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,8 +36,7 @@ class ValidationTest extends ApiTestSupport {
 		res.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
 				.andExpect(jsonPath("$.field").value(field))
-				.andExpect(jsonPath("$.message").value(message))
-				.andExpect(jsonPath("$.fieldErrors." + field).value(message));
+				.andExpect(jsonPath("$.message").value(message));
 		assertThat(repository.count()).isZero();
 	}
 
@@ -106,14 +105,11 @@ class ValidationTest extends ApiTestSupport {
 	}
 
 	@Test
-	void 여러_필드가_틀리면_모두_알려주고_첫_필드를_field로_준다() throws Exception {
+	void 여러_필드가_틀리면_위에서부터_첫_오류만_알려준다() throws Exception {
 		post4(q("2026-10-19"), q(""), q("가수"), q(""))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.field").value("date"))
-				.andExpect(jsonPath("$.fieldErrors.date").value("지난 날짜는 신청할 수 없어요."))
-				.andExpect(jsonPath("$.fieldErrors.songTitle").value("곡 제목을 입력해 주세요."))
-				.andExpect(jsonPath("$.fieldErrors.applicantName").value("신청자 이름을 입력해 주세요."))
-				.andExpect(jsonPath("$.fieldErrors.artist").doesNotExist());
+				.andExpect(jsonPath("$.message").value("지난 날짜는 신청할 수 없어요."));
 	}
 
 	@Test

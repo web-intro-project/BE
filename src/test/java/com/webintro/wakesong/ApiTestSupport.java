@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.webintro.wakesong.common.TimeConfig;
-import com.webintro.wakesong.request.SongRequest;
-import com.webintro.wakesong.request.SongRequestRepository;
+import com.webintro.wakesong.config.ClockConfig;
+import com.webintro.wakesong.domain.SongRequest;
+import com.webintro.wakesong.repository.SongRequestRepository;
 
 /** API 테스트 공통: 서울 기준 2026-10-20 10:00으로 고정된 시계, 테스트마다 빈 DB. */
 @SpringBootTest
@@ -48,7 +48,7 @@ public abstract class ApiTestSupport {
 		@Bean
 		@Primary
 		Clock fixedClock() {
-			return Clock.fixed(NOW, TimeConfig.SEOUL);
+			return Clock.fixed(NOW, ClockConfig.SEOUL);
 		}
 
 	}
