@@ -20,8 +20,9 @@ public class SongRequestService {
 
 	@Transactional
 	public SongRequestResponse create(CreateSongRequest body) {
-		SongRequest saved = repository.save(new SongRequest(body.date(), body.songTitle().strip(),
-				body.artist().strip(), body.applicantName().strip(), Instant.now(clock)));
+		SongRequestValidator.Valid v = SongRequestValidator.validate(body, LocalDate.now(clock));
+		SongRequest saved = repository.save(
+				new SongRequest(v.date(), v.songTitle(), v.artist(), v.applicantName(), Instant.now(clock)));
 		return SongRequestResponse.from(saved);
 	}
 
