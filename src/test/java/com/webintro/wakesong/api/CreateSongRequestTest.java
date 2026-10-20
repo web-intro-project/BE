@@ -1,4 +1,4 @@
-package com.webintro.wakesong.request;
+package com.webintro.wakesong.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

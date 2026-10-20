@@ -1,4 +1,4 @@
-package com.webintro.wakesong.common;
+package com.webintro.wakesong.api;
 
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.containsString;
@@ -19,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.webintro.wakesong.request.SongRequestRepository;
+import com.webintro.wakesong.repository.SongRequestRepository;
 
 /** DB 장애 시 500이 나가되 내부 정보는 응답에 실리지 않는다. */
 @SpringBootTest
@@ -48,7 +48,7 @@ class InternalErrorTest {
 
 	@Test
 	void 조회_실패도_안전한_500() throws Exception {
-		given(repository.findByRequestDateOrderByCreatedAtAscIdAsc(any()))
+		given(repository.findAllByDate(any()))
 				.willThrow(new DataAccessResourceFailureException(SECRET));
 
 		mvc.perform(get("/api/today"))
