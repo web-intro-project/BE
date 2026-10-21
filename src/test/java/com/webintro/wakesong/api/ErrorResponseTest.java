@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 
 import com.webintro.wakesong.ApiTestSupport;
 
+/** [FR-07] 공통 오류 응답(400 깨진 JSON, 404, 405, 415)과 CORS 허용/거부. */
 class ErrorResponseTest extends ApiTestSupport {
 
 	@Test

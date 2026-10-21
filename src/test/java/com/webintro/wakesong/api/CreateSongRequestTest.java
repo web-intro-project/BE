@@ -11,8 +11,13 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.webintro.wakesong.ApiTestSupport;
 
+/**
+ * [FR-02, FR-03] POST /api/requests — 신청 저장의 정상 동작.
+ * 입력 검증 실패 케이스는 {@link ValidationTest}에 있다.
+ */
 class CreateSongRequestTest extends ApiTestSupport {
 
+	/** JSON 문자열을 본문으로 POST /api/requests 요청을 보낸다. */
 	private ResultActions postJson(String json) throws Exception {
 		return mvc.perform(post("/api/requests").contentType(MediaType.APPLICATION_JSON).content(json));
 	}
