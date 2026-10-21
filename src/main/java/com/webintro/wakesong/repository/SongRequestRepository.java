@@ -1,40 +1,32 @@
+// 이 파일이 repository 패키지에 속한다고 알려주는 코드
 package com.webintro.wakesong.repository;
 
+// 날짜(LocalDate)와 목록(List) 클래스를 가져오는 코드
 import java.time.LocalDate;
 import java.util.List;
 
+// Spring Data JPA의 기본 리포지토리와 @Query 어노테이션을 가져오는 코드
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+// 신청 엔티티를 가져오는 코드
 import com.webintro.wakesong.domain.SongRequest;
 
 /**
  * song_requests 테이블에 접근하는 창구.
- *
- * <p>인터페이스만 만들면 Spring Data JPA가 구현체를 자동으로 만들어 준다.
- * {@code JpaRepository<SongRequest, Long>}을 상속해서 save(), findById(), count(), deleteAll() 같은
- * 기본 메서드는 따로 작성하지 않아도 쓸 수 있다.
- *
- * <p>아래 두 메서드는 {@code @Query}에 JPQL(엔티티 기준 SQL)을 직접 적었다.
- * 정렬 기준 "접수 시각 → 같으면 id"는 대표곡·목록 순서를 항상 똑같이 만들기 위한 것이다.
+ * 인터페이스만 만들면 Spring Data JPA가 구현을 자동으로 만들어 준다.
  */
+// SongRequest(id 타입 Long)용 리포지토리를 선언하고, save·findById·count·deleteAll 같은 기본 기능을 물려받는 코드
 public interface SongRequestRepository extends JpaRepository<SongRequest, Long> {
 
-	/**
-	 * 하루치 신청을 접수 순으로 가져온다.
-	 *
-	 * @param date 신청 날짜
-	 * @return 접수 시각 오름차순(같으면 id 오름차순). 없으면 빈 리스트
-	 */
+	// 특정 날짜의 신청을 접수 시각 순(같으면 id 순)으로 조회하는 JPQL을 지정하는 코드
 	@Query("select r from SongRequest r where r.requestDate = :date order by r.createdAt, r.id")
+	// 하루치 신청 목록을 가져오는 메서드를 선언하는 코드
 	List<SongRequest> findAllByDate(LocalDate date);
 
-	/**
-	 * 기간(from ~ to, 양 끝 포함) 안의 신청을 가져온다. 달력에서 한 달치를 한 번에 읽을 때 쓴다.
-	 *
-	 * @return 날짜 순 → 같은 날짜 안에서는 접수 순
-	 */
+	// from~to 기간의 신청을 날짜 순 → 접수 순으로 조회하는 JPQL을 지정하는 코드
 	@Query("select r from SongRequest r where r.requestDate between :from and :to order by r.requestDate, r.createdAt, r.id")
+	// 기간(달력 한 달치) 신청 목록을 가져오는 메서드를 선언하는 코드
 	List<SongRequest> findAllBetween(LocalDate from, LocalDate to);
 
 }
