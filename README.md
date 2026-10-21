@@ -21,11 +21,11 @@
 src/main/java/com/webintro/wakesong/
 ├── controller/SongController       API 4개. 받아서 Service에 넘기기만 한다
 ├── service/SongService             업무 규칙 전부 (대표곡, 저장+입력 검사, 날짜별, 달력)
-├── repository/SongRequestRepository  DB 조회 2개: findAllByDate, findAllBetween
+├── repository/SongRequestRepository  DB 조회 2개: findByRequestDateOrderById, findByRequestDateBetweenOrderById
 ├── domain/SongRequest              song_requests 테이블 한 줄
 ├── dto/                            요청/응답 JSON 모양 (SongCreateRequest, SongResponse, ...)
-├── exception/                      오류 → {code, message, field} 응답 변환
-└── config/                         서울 시계(ClockConfig), CORS
+├── exception/                      입력 오류(400) → {code, message, field} 응답 변환
+└── config/                         CORS 설정
 ```
 
 | API | Controller | Service |
@@ -75,7 +75,7 @@ export DB_PASSWORD=change-me
 | GET | `/api/requests?date=YYYY-MM-DD` | 날짜별 신청 목록 (접수 순) |
 | GET | `/api/calendar?month=YYYY-MM` | 그 달 모든 날짜의 신청 건수와 곡 목록 |
 
-오류 응답은 `{code, message, field?}` 형식이다. 입력 오류는 위에서부터 검사해 첫 번째 오류만 돌려준다 (`VALIDATION_ERROR` 400, `NOT_FOUND` 404, `METHOD_NOT_ALLOWED` 405, `INTERNAL_SERVER_ERROR` 500).
+입력 오류(400)는 `{code, message, field}` 형식이고, 위에서부터 검사해 첫 번째 오류만 돌려준다. 404·405·500 등은 스프링 기본 오류 응답이다. 자세한 내용은 [`API_SPEC.md`](API_SPEC.md).
 
 ### CORS
 
