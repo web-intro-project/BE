@@ -11,8 +11,9 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-// 서비스 등록용 스프링 어노테이션을 가져오는 코드
+// 서비스 등록·트랜잭션용 스프링 어노테이션을 가져오는 코드
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 // 엔티티, 요청·응답 DTO, 입력 오류 예외, 리포지토리를 가져오는 코드
 import com.webintro.wakesong.domain.SongRequest;
@@ -40,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 // final 필드(repository)를 받는 생성자를 자동으로 만들어주는 코드
 @RequiredArgsConstructor
+// 모든 메서드를 읽기 전용 트랜잭션으로 실행하게 하는 코드 (DB에 쓰는 create()만 따로 풀어줌)
+@Transactional(readOnly = true)
 // 기상송 서비스 클래스를 선언하는 코드
 public class SongService {
 
@@ -71,6 +74,8 @@ public class SongService {
 		return new TodayResponse(today, todayRequests.size(), first);
 	}
 
+	// 이 메서드만 DB 쓰기가 가능한 트랜잭션으로 실행하게 하는 코드
+	@Transactional
 	// [FR-02, FR-03] 신청을 검사하고 저장하는 메서드를 선언하는 코드
 	public SongResponse create(SongCreateRequest req) {
 		// 신청 날짜를 검사하고 LocalDate로 바꾸는 코드 (틀리면 400 예외)
