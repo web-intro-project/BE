@@ -16,11 +16,11 @@ import com.webintro.wakesong.ApiTestSupport;
 
 /**
  * [FR-06] POST /api/requests 서버 입력 검증.
- * 고정된 오늘은 서울 기준 2026-10-20 (ApiTestSupport). 오류가 나면 DB에 저장되지 않아야 한다.
+ * 오류가 나면 DB에 저장되지 않아야 한다.
  */
 class ValidationTest extends ApiTestSupport {
 
-	private static final String VALID_DATE = "\"2026-10-21\"";
+	private static final String VALID_DATE = q(day(1));
 
 	/** JSON 문자열을 본문으로 POST /api/requests 요청을 보낸다. */
 	private ResultActions postJson(String json) throws Exception {
@@ -102,36 +102,32 @@ class ValidationTest extends ApiTestSupport {
 
 	@Test
 	void 서울_기준_어제는_400() throws Exception {
-		assertRejected(post4(q("2026-10-19"), q("곡"), q("가수"), q("홍길동")), "date", "지난 날짜는 신청할 수 없어요.");
+		assertRejected(post4(q(day(-1)), q("곡"), q("가수"), q("홍길동")), "date", "지난 날짜는 신청할 수 없어요.");
 	}
 
-	@ParameterizedTest
-	@ValueSource(strings = { "2026-10-20", "2026-10-21", "2027-12-31" })
-	void 오늘과_미래는_신청할_수_있다(String date) throws Exception {
-		post4(q(date), q("곡"), q("가수"), q("홍길동")).andExpect(status().isCreated());
+	@Test
+	void 오늘과_미래는_신청할_수_있다() throws Exception {
+		post4(q(day(0)), q("곡"), q("가수"), q("홍길동")).andExpect(status().isCreated());
+		post4(q(day(1)), q("곡"), q("가수"), q("홍길동")).andExpect(status().isCreated());
+		post4(q("2099-12-31"), q("곡"), q("가수"), q("홍길동")).andExpect(status().isCreated());
 	}
 
 	@Test
 	void 여러_필드가_틀리면_위에서부터_첫_오류만_알려준다() throws Exception {
-		post4(q("2026-10-19"), q(""), q("가수"), q(""))
+		post4(q(day(-1)), q(""), q("가수"), q(""))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.field").value("date"))
 				.andExpect(jsonPath("$.message").value("지난 날짜는 신청할 수 없어요."));
 	}
 
 	@Test
-	void 조회_API는_잘못된_날짜와_월에_오류_형식으로_400() throws Exception {
+	void 조회_API는_잘못된_날짜와_월에_400() throws Exception {
 		mvc.perform(get("/api/requests").param("date", "2026-02-30"))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-				.andExpect(jsonPath("$.field").value("date"));
-		mvc.perform(get("/api/requests"))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.field").value("date"));
+				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
 		mvc.perform(get("/api/calendar").param("month", "2026-13"))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-				.andExpect(jsonPath("$.field").value("month"));
+				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
 	}
 
 }

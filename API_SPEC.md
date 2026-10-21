@@ -14,7 +14,7 @@
 | 오늘 기준 | 항상 **Asia/Seoul**. 서버가 어느 시간대에서 돌든 서울 날짜로 판단 |
 | 날짜 형식 | `date`: `YYYY-MM-DD` (예: `2026-10-21`), `month`: `YYYY-MM` (예: `2026-10`) |
 | 시각 형식 | `createdAt`: ISO 8601 **UTC** (예: `2026-10-20T09:55:46.893188Z`). 화면에는 서울 시각으로 바꿔 표시 |
-| 정렬 | 신청 목록은 항상 **접수 순** (`createdAt` 오름차순, 같으면 `id` 오름차순) |
+| 정렬 | 신청 목록은 항상 **접수 순** (= `id` 오름차순. 먼저 저장된 신청일수록 `id`가 작다) |
 | 빈 결과 | 오류가 아니다. `200` + `null` 또는 빈 배열 `[]` |
 
 ## 2. API 목록
@@ -145,11 +145,7 @@ Content-Type: application/json
 { "code": "VALIDATION_ERROR", "message": "지난 날짜는 신청할 수 없어요.", "field": "date" }
 ```
 
-`Content-Type`이 JSON이 아니면 `415`:
-
-```json
-{ "code": "UNSUPPORTED_MEDIA_TYPE", "message": "JSON(application/json)으로 보내 주세요." }
-```
+`Content-Type`이 JSON이 아니면 `415` (스프링 기본 오류 응답, [7. 오류 응답](#7-오류-응답) 참고).
 
 ---
 
@@ -209,7 +205,7 @@ GET /api/requests?date=YYYY-MM-DD
 `date`가 없거나 형식이 틀리면 (`2026-13-01`, `20261020` 등):
 
 ```json
-{ "code": "VALIDATION_ERROR", "message": "날짜 형식이 올바르지 않아요. (YYYY-MM-DD)", "field": "date" }
+{ "code": "VALIDATION_ERROR", "message": "날짜 형식이 올바르지 않아요. (date: YYYY-MM-DD, month: YYYY-MM)", "field": null }
 ```
 
 ---
@@ -274,32 +270,39 @@ GET /api/calendar?month=YYYY-MM
 `month`가 없거나 형식이 틀리면 (`2026-13`, `2026-1`, `2026-10-01` 등):
 
 ```json
-{ "code": "VALIDATION_ERROR", "message": "월 형식이 올바르지 않아요. (YYYY-MM)", "field": "month" }
+{ "code": "VALIDATION_ERROR", "message": "날짜 형식이 올바르지 않아요. (date: YYYY-MM-DD, month: YYYY-MM)", "field": null }
 ```
 
 ---
 
 ## 7. 오류 응답
 
-모든 오류는 같은 모양이다.
+### 400 입력 오류 — 우리 서버가 만드는 응답
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
-| `code` | string | 오류 종류 (아래 표) |
+| `code` | string | 항상 `VALIDATION_ERROR` |
 | `message` | string | 화면에 그대로 보여줄 수 있는 한국어 문구 |
-| `field` | string | 입력 오류일 때만. 틀린 입력칸 / 파라미터 이름 |
-
-| HTTP | `code` | 언제 |
-|---|---|---|
-| 400 | `VALIDATION_ERROR` | 입력값·쿼리 파라미터 오류, 깨진 JSON |
-| 404 | `NOT_FOUND` | 없는 주소 (예: `GET /api/nope`). **빈 목록은 404가 아니라 200** |
-| 405 | `METHOD_NOT_ALLOWED` | 지원하지 않는 메서드 (예: `DELETE /api/requests`) |
-| 415 | `UNSUPPORTED_MEDIA_TYPE` | POST 본문이 JSON이 아님 |
-| 500 | `INTERNAL_SERVER_ERROR` | DB 장애 등 서버 오류. 내부 정보(SQL, 스택트레이스)는 응답에 포함되지 않음 |
+| `field` | string \| null | `POST /api/requests` 입력 오류일 때 틀린 입력칸 이름. 쿼리 파라미터 오류·깨진 JSON은 `null` |
 
 ```json
-{ "code": "INTERNAL_SERVER_ERROR", "message": "일시적인 오류로 요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요." }
+{ "code": "VALIDATION_ERROR", "message": "곡 제목을 입력해 주세요.", "field": "songTitle" }
 ```
+
+### 그 밖의 오류 — 스프링 기본 응답
+
+| HTTP | 언제 |
+|---|---|
+| 404 | 없는 주소 (예: `GET /api/nope`). **빈 목록은 404가 아니라 200** |
+| 405 | 지원하지 않는 메서드 (예: `DELETE /api/requests`) |
+| 415 | POST 본문이 JSON이 아님 |
+| 500 | DB 장애 등 서버 오류 |
+
+```json
+{ "timestamp": "2026-10-21T11:14:17.741Z", "status": 404, "error": "Not Found", "path": "/api/nope" }
+```
+
+`message`가 없으므로 FE는 자체 기본 문구("요청을 처리하지 못했어요.")를 보여 준다. 스택트레이스 등 내부 정보는 응답에 포함되지 않는다.
 
 ## 8. CORS
 
@@ -313,6 +316,5 @@ GET /api/calendar?month=YYYY-MM
 |---|---|---|---|
 | `GET /api/today` | `{date, song}` | `requestCount` 추가 | FE 메인 화면이 "오늘 신청 N건" 표시 |
 | 달력 `days` | 신청 있는 날만 (제안) | 그 달 모든 날짜 | FE `calendar.html`이 `days`를 그대로 달력 칸으로 그림 |
-| 오류 응답 | `{code, message, fieldErrors}` (제안) | `{code, message, field}` | FE는 첫 오류의 `field`만 사용 |
-| 415 | 없음 | `UNSUPPORTED_MEDIA_TYPE` | JSON이 아닌 요청 구분 |
+| 오류 응답 | `{code, message, fieldErrors}` (제안) | 400만 `{code, message, field}`, 나머지는 스프링 기본 | FE는 400의 `field`·`message`만 사용, 코드 단순화 |
 | `requestNumber` | 미확정 | 없음 | 완료 화면은 날짜별 목록에서 순번 계산 |
