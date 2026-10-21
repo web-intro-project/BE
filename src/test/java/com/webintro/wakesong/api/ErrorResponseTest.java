@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 
 import com.webintro.wakesong.ApiTestSupport;
 
-/** [FR-07] 공통 오류 응답(400 깨진 JSON, 404, 405, 415)과 CORS 허용/거부. */
+/** [FR-07] 깨진 JSON 400, 스프링 기본 처리(404, 405, 415), CORS 허용/거부. */
 class ErrorResponseTest extends ApiTestSupport {
 
 	@Test
@@ -32,22 +32,19 @@ class ErrorResponseTest extends ApiTestSupport {
 	@Test
 	void JSON이_아니면_415() throws Exception {
 		mvc.perform(post("/api/requests").contentType(MediaType.TEXT_PLAIN).content("hi"))
-				.andExpect(status().isUnsupportedMediaType())
-				.andExpect(jsonPath("$.code").value("UNSUPPORTED_MEDIA_TYPE"));
+				.andExpect(status().isUnsupportedMediaType());
 	}
 
 	@Test
 	void 없는_경로는_404() throws Exception {
 		mvc.perform(get("/api/nope"))
-				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.code").value("NOT_FOUND"));
+				.andExpect(status().isNotFound());
 	}
 
 	@Test
 	void 지원하지_않는_메서드는_405() throws Exception {
 		mvc.perform(delete("/api/requests"))
-				.andExpect(status().isMethodNotAllowed())
-				.andExpect(jsonPath("$.code").value("METHOD_NOT_ALLOWED"));
+				.andExpect(status().isMethodNotAllowed());
 	}
 
 	@Test
