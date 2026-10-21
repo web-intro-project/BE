@@ -1,20 +1,33 @@
+# ============================================================
+# 기본 설정 (MySQL 사용)
+# ${이름:기본값} = 환경변수 "이름"이 있으면 그 값, 없으면 기본값을 쓴다.
+# 비밀번호 같은 값은 여기 적지 말고 환경변수로 넣는다. (.env.example 참고)
+# ============================================================
 spring:
   application:
     name: wakesong
+
+  # DB 접속 정보
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/wakesong?characterEncoding=UTF-8}
     username: ${DB_USERNAME:wakesong}
     password: ${DB_PASSWORD:}
+
   jpa:
+    # 응답을 만드는 동안 DB 연결을 붙잡고 있지 않는다 (DB 작업은 서비스 안에서 끝낸다)
     open-in-view: false
     hibernate:
+      # 서버 시작 시 엔티티를 보고 테이블을 만들거나 컬럼을 추가한다
+      # update(기본) | validate(검사만) | none(아무것도 안 함)
       ddl-auto: ${DDL_AUTO:update}
     properties:
       hibernate:
         jdbc:
+          # 시각(created_at)은 DB에 UTC로 저장한다. 서버·DB의 시간대 설정이 달라도 값이 어긋나지 않는다
           time_zone: UTC
 
 app:
   cors:
-    # FE 개발 서버(python3 -m http.server 8000) 기본값. 배포 시 실제 FE 주소로 지정한다.
+    # API를 호출할 수 있는 FE 주소 목록 (쉼표로 구분)
+    # 기본값은 FE 개발 서버(python3 -m http.server 8000). 배포 시 실제 FE 주소로 지정한다.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8000,http://127.0.0.1:8000}

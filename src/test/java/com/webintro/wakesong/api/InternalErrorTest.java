@@ -21,7 +21,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.webintro.wakesong.repository.SongRequestRepository;
 
-/** DB 장애 시 500이 나가되 내부 정보는 응답에 실리지 않는다. */
+/**
+ * [FR-07] DB 장애 시 500이 나가되, 응답에 내부 정보(접속 주소·비밀번호·예외 이름)가 실리지 않는지 확인한다.
+ *
+ * <p>{@code @MockitoBean}: 진짜 리포지토리 대신 가짜(mock)를 넣어서 일부러 DB 오류를 일으킨다.
+ * 가짜 빈을 쓰면 스프링을 따로 띄워야 하므로 ApiTestSupport를 상속하지 않는다.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class InternalErrorTest {
