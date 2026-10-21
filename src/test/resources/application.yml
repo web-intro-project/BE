@@ -1,11 +1,17 @@
+# ============================================================
+# 테스트 전용 설정 (src/main/resources/application.yml 대신 이 파일이 쓰인다)
+# 실제 DB를 건드리지 않도록 메모리에만 있는 H2 DB를 쓴다. 테스트가 끝나면 사라진다.
+# ============================================================
 spring:
   datasource:
+    # mem: 메모리 DB, DB_CLOSE_DELAY=-1: 테스트 도중 연결이 끊겨도 DB를 지우지 않음
     url: jdbc:h2:mem:wakesong;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
     username: sa
     password:
   jpa:
     open-in-view: false
     hibernate:
+      # 테스트 시작 때 테이블을 만들고 끝날 때 지운다
       ddl-auto: create-drop
     properties:
       hibernate:
@@ -14,4 +20,5 @@ spring:
 
 app:
   cors:
+    # CORS 테스트(ErrorResponseTest)에서 허용되는 FE 주소
     allowed-origins: http://localhost:8000

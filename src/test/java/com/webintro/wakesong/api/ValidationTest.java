@@ -14,24 +14,31 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.webintro.wakesong.ApiTestSupport;
 
-/** FR-06 서버 입력 검증. 고정된 오늘은 서울 기준 2026-10-20. */
+/**
+ * [FR-06] POST /api/requests 서버 입력 검증.
+ * 고정된 오늘은 서울 기준 2026-10-20 (ApiTestSupport). 오류가 나면 DB에 저장되지 않아야 한다.
+ */
 class ValidationTest extends ApiTestSupport {
 
 	private static final String VALID_DATE = "\"2026-10-21\"";
 
+	/** JSON 문자열을 본문으로 POST /api/requests 요청을 보낸다. */
 	private ResultActions postJson(String json) throws Exception {
 		return mvc.perform(post("/api/requests").contentType(MediaType.APPLICATION_JSON).content(json));
 	}
 
+	/** 네 필드를 JSON 조각 그대로 받아 요청한다. null, 따옴표 없는 값 등을 넣어 보기 위해 따옴표는 호출하는 쪽이 붙인다. */
 	private ResultActions post4(String date, String songTitle, String artist, String applicantName) throws Exception {
 		return postJson("{\"date\":%s,\"songTitle\":%s,\"artist\":%s,\"applicantName\":%s}"
 				.formatted(date, songTitle, artist, applicantName));
 	}
 
+	/** 문자열에 JSON 따옴표를 붙인다. q("곡") → "\"곡\"" */
 	private static String q(String s) {
 		return "\"" + s + "\"";
 	}
 
+	/** 400 + VALIDATION_ERROR + 기대한 field/message 이고, DB에 아무것도 저장되지 않았는지 확인한다. */
 	private void assertRejected(ResultActions res, String field, String message) throws Exception {
 		res.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))

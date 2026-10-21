@@ -16,6 +16,7 @@ import com.webintro.wakesong.config.ClockConfig;
 import com.webintro.wakesong.dto.TodayResponse;
 import com.webintro.wakesong.service.SongService;
 
+/** [FR-01] GET /api/today — 오늘의 대표 신청곡 (가장 먼저 접수된 곡, 신청 없음, 서울 기준 날짜). */
 class TodayTest extends ApiTestSupport {
 
 	@Test

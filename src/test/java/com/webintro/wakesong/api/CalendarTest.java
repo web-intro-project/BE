@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.webintro.wakesong.ApiTestSupport;
 
+/** [FR-04] GET /api/calendar?month= — 월별 달력 (모든 날짜 포함, 다른 달 제외, 상세와 건수 일치, 잘못된 월). */
 class CalendarTest extends ApiTestSupport {
 
 	@Test

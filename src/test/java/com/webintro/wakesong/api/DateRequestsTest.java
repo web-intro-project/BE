@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.webintro.wakesong.ApiTestSupport;
 
+/** [FR-05] GET /api/requests?date= — 날짜별 신청 목록 (접수 순 정렬, 빈 목록, 지난 날짜 조회, 잘못된 날짜). */
 class DateRequestsTest extends ApiTestSupport {
 
 	@Test
