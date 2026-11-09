@@ -32,8 +32,8 @@ public class CorsConfig implements WebMvcConfigurer {
 				.allowedOrigins(allowedOrigins)
 				// GET, POST 요청만 허용하는 코드
 				.allowedMethods("GET", "POST")
-				// JSON 본문을 보낼 때 필요한 Content-Type 헤더만 허용하는 코드
-				.allowedHeaders("Content-Type");
+				// JSON 본문과 ngrok 브라우저 경고 우회에 필요한 헤더를 허용하는 코드
+				.allowedHeaders("Content-Type", "ngrok-skip-browser-warning");
 	}
 
 }

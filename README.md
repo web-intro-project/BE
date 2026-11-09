@@ -64,6 +64,19 @@ export DB_PASSWORD=change-me
 
 환경변수 목록은 `.env.example` 참고. 테이블(`song_requests`)은 시작 시 자동 생성된다 (`DDL_AUTO`, 기본 `update`).
 
+Windows PowerShell에서는 다음과 같이 실행한다 (위에서 만든 MySQL 계정 기준).
+
+```powershell
+$env:DB_URL='jdbc:mysql://localhost:3306/wakesong?serverTimezone=Asia/Seoul&characterEncoding=UTF-8'
+$env:DB_USERNAME='wakesong'
+$env:DB_PASSWORD='change-me'
+.\gradlew.bat bootRun --args="--spring.profiles.active=default --server.address=0.0.0.0 --server.port=8081"
+```
+
+MySQL 서버가 실행 중이어야 한다. MySQL 사용 시 `local` 프로필은 지정하지 않는다.
+`.env` 파일은 자동으로 로드되지 않으므로 위처럼 셸 환경변수로 지정한다.
+기존 H2 파일의 데이터는 MySQL로 자동 이전되지 않는다.
+
 ## API
 
 모든 날짜 판단은 Asia/Seoul 기준이다.
