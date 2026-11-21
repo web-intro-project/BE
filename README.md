@@ -8,7 +8,7 @@
 ## 기술 스택
 
 - Java 17, Spring Boot 4.1 (Web MVC, Data JPA), Lombok
-- DB: MySQL (기본) / H2 (`local` 프로필, 테스트)
+- DB: H2 (기본 `local` 프로필, 테스트) / MySQL (`default` 프로필 명시)
 - 빌드: Gradle Wrapper, 테스트: JUnit 5 + MockMvc
 
 > 명세서의 추천안은 Spring Boot 3.x였지만, 3.x는 오픈소스 지원이 끝나 Spring Initializr 기본값인 4.1을 사용한다.
@@ -39,13 +39,19 @@ src/main/java/com/webintro/wakesong/
 
 JDK 17 이상이 필요하다.
 
-### MySQL 없이 바로 실행 (`local` 프로필)
+### 로컬 H2로 실행
 
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=local'
+./gradlew bootRun
 ```
 
-`./data` 폴더의 H2 파일에 저장되므로 서버를 다시 켜도 데이터가 유지된다.
+Windows PowerShell에서는 다음 명령을 실행한다.
+
+```powershell
+.\gradlew.bat bootRun
+```
+
+프로필을 지정하지 않으면 `local` 프로필이 적용된다. H2가 `./data/wakesong.mv.db`에 데이터를 저장하므로 서버를 다시 켜도 데이터가 유지된다.
 
 ### MySQL로 실행
 
@@ -59,7 +65,7 @@ GRANT ALL PRIVILEGES ON wakesong.* TO 'wakesong'@'localhost';
 export DB_URL='jdbc:mysql://localhost:3306/wakesong?characterEncoding=UTF-8'
 export DB_USERNAME=wakesong
 export DB_PASSWORD=change-me
-./gradlew bootRun
+./gradlew bootRun --args='--spring.profiles.active=default'
 ```
 
 환경변수 목록은 `.env.example` 참고. 테이블(`song_requests`)은 시작 시 자동 생성된다 (`DDL_AUTO`, 기본 `update`).
@@ -73,7 +79,7 @@ $env:DB_PASSWORD='change-me'
 .\gradlew.bat bootRun --args="--spring.profiles.active=default --server.address=0.0.0.0 --server.port=8081"
 ```
 
-MySQL 서버가 실행 중이어야 한다. MySQL 사용 시 `local` 프로필은 지정하지 않는다.
+MySQL 서버를 실행한 뒤 `default` 프로필을 명시한다.
 `.env` 파일은 자동으로 로드되지 않으므로 위처럼 셸 환경변수로 지정한다.
 기존 H2 파일의 데이터는 MySQL로 자동 이전되지 않는다.
 
